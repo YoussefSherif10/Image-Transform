@@ -67,8 +67,11 @@ PNG createSpotlight(PNG image, int centerX, int centerY) {
       luminance at most.*/
       double yAxis = fabs(centerY - (double)y) ;
       double distance = sqrt(xAxis*xAxis + yAxis*yAxis) ;
+      double dec = distance / 2 ;
 
-      pixel.l = (distance > 160) ? (pixel.l * 0.2) : (pixel.l * 0.975) ;
+      if(distance != 0 ){
+        pixel.l = (distance > 160) ? (pixel.l * 0.2) : (pixel.l * (1-(dec/100))) ;
+      }
     }
   }
   return image;
@@ -91,7 +94,7 @@ PNG illinify(PNG image) {
     for (unsigned y = 0; y < image.height(); y++) {
       HSLAPixel & pixel = image.getPixel(x, y);
 
-      double hue = (pixel.h > 360) ? (fmod(pixel.h,360)) : pixel.h ;
+      double hue = fmod(pixel.h,359);
       pixel.h = (hue > 102.5) ? 216 : 11 ;
     }
   }
@@ -116,16 +119,10 @@ PNG watermark(PNG firstImage, PNG secondImage) {
   for (unsigned x = 0; x < firstImage.width(); x++) {
     for (unsigned y = 0; y < firstImage.height(); y++) {
       HSLAPixel & fpixel = firstImage.getPixel(x, y);
+      HSLAPixel & spixel = secondImage.getPixel(x, y);
 
-      for (unsigned x = 0; x < secondImage.width(); x++) {
-        for (unsigned y = 0; y < secondImage.height(); y++) {
-          HSLAPixel & spixel = secondImage.getPixel(x, y);
-
-          if(spixel.l != 0){
-            fpixel.l = fmod((fpixel.l + 0.2) , 1) ;
-          }
-
-        }
+      if(spixel.l != 0){
+        fpixel.l = fmod(fpixel.l + 0.2 , 1);
       }
 
     }
