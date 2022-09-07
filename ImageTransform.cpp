@@ -6,16 +6,7 @@
 #include "uiuc/HSLAPixel.h"
 #include "ImageTransform.h"
 
-/* ******************
-(Begin multi-line comment...)
 
-Write your name and email address in the comment space here:
-
-Name:
-Email:
-
-(...end multi-line comment.)
-******************** */
 
 using uiuc::PNG;
 using uiuc::HSLAPixel;
@@ -28,8 +19,6 @@ using uiuc::HSLAPixel;
  * @return The grayscale image.
  */
 PNG grayscale(PNG image) {
-  /// This function is already written for you so you can see how to
-  /// interact with our PNG class.
   for (unsigned x = 0; x < image.width(); x++) {
     for (unsigned y = 0; y < image.height(); y++) {
       HSLAPixel & pixel = image.getPixel(x, y);
@@ -67,6 +56,20 @@ PNG grayscale(PNG image) {
  * @return The image with a spotlight.
  */
 PNG createSpotlight(PNG image, int centerX, int centerY) {
+  for (unsigned x = 0; x < image.width(); x++) {
+    double xAxis = fabs(centerX - (double)x) ; // get the x distance from the specified crnter
+    for (unsigned y = 0; y < image.height(); y++) {
+      HSLAPixel & pixel = image.getPixel(x, y);
+
+      /* To spotlight an image is to create a spotlight pattern centered at a given point (centerX, centerY).
+      A spotlight adjusts the luminance of a pixel based on the distance between the the pixel and the designated
+      center by decreasing the luminance by 0.5% per 1 pixel unit of Euclidean distance, up to an 80% decrease in
+      luminance at most.*/
+      double yAxis = fabs(centerY - (double)y) ;
+      double distance = sqrt(xAxis*xAxis + yAxis*yAxis) ;
+
+      pixel.l = (distance > 160) ? (pixel.l * 0.2) : (pixel.l * 0.975) ;
+    }
 
   return image;
   
@@ -84,6 +87,14 @@ PNG createSpotlight(PNG image, int centerX, int centerY) {
  * @return The illinify'd image.
 **/
 PNG illinify(PNG image) {
+  for (unsigned x = 0; x < image.width(); x++) {
+    for (unsigned y = 0; y < image.height(); y++) {
+      HSLAPixel & pixel = image.getPixel(x, y);
+
+      double hue = (pixel.h > 360) ? (fmod(pixel.h,360)) : pixel.h ;
+      pixel.h = (hue > 102.5) ? 216 : 11 ;
+    }
+  }
 
   return image;
 }
@@ -102,6 +113,23 @@ PNG illinify(PNG image) {
 * @return The watermarked image.
 */
 PNG watermark(PNG firstImage, PNG secondImage) {
+  for (unsigned x = 0; x < firstImage.width(); x++) {
+    for (unsigned y = 0; y < firstImage.height(); y++) {
+      HSLAPixel & fpixel = firstImage.getPixel(x, y);
+
+      for (unsigned x = 0; x < secondImage.width(); x++) {
+        for (unsigned y = 0; y < secondImage.height(); y++) {
+          HSLAPixel & spixel = secondImage.getPixel(x, y);
+
+          if(spixel.l != 0){
+            fpixel.l = fmod((fpixel + 0.2) , 1) ;
+          }
+
+        }
+      }
+
+    }
+  }
 
   return firstImage;
 }
