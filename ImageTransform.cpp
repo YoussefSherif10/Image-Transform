@@ -70,7 +70,7 @@ PNG createSpotlight(PNG image, int centerX, int centerY) {
 
       pixel.l = (distance > 160) ? (pixel.l * 0.2) : (pixel.l * 0.975) ;
     }
-
+  }
   return image;
   
 }
@@ -122,7 +122,7 @@ PNG watermark(PNG firstImage, PNG secondImage) {
           HSLAPixel & spixel = secondImage.getPixel(x, y);
 
           if(spixel.l != 0){
-            fpixel.l = fmod((fpixel + 0.2) , 1) ;
+            fpixel.l = fmod((fpixel.l + 0.2) , 1) ;
           }
 
         }
